@@ -1,4 +1,13 @@
 # Delta Neutral Portfolio
+**DNP - Delta Neutral Portfolio**: A smart contract-based hedge fund that dynamically rebalances positions to maintain delta neutrality.
+
+## Quick Start
+```js
+npm install --save-dev hardhat
+npx hardhat init
+npx hardhat compile
+npx hardhat test
+```
 
 ## Delta: A Measure of Price Sensitivity
 Delta is a measure of how much the price of a derivative (like an option) changes when the price of the underlying asset (like a stock) changes.  
@@ -11,7 +20,6 @@ The delta is calculated using a pricing model to compute both the option's price
 ### Example
 If you have an option with a delta of 0.5, then for every \$1 increase in the price of the underlying asset, the option's price is expected to increase by about \$0.5.
 
----
 
 ## Delta Neutral: Balancing Out Risk
 Delta neutral means the overall portfolio delta is zero, so the gains and losses from price movements of the underlying asset cancel each other out.
@@ -26,13 +34,9 @@ Suppose you hold a call option on ETH that has a delta of 0.5. This means the op
 To achieve a delta neutral position, you could short (sell) a certain amount of ETH such that the loss from the short position offsets the gain from the call option when ETH's price moves.  
 If you do this correctly, small moves in ETH's price won't change the overall value of your combined positions.
 
----
-
 ## Rebalancing
 The delta of options isn't static; it changes as the price of the underlying asset changes. This is why traders often need to rebalance their portfolio to maintain delta neutrality.  
 In blockchain environments, rebalancing can be complex and may involve transaction costs, so automated systems are often used to manage this.
-
----
 
 ## Make Money?
 Even though the portfolio is hedged against small directional moves, the idea isn't to "do nothing" but rather to profit from factors other than simple price movement, such as:
@@ -109,8 +113,3 @@ Now suppose the stock falls from \$100 to \$99.
 *(Note: The exact numbers depend on how the option's delta changes and how quickly you rebalance. In a dynamic delta–hedging strategy, you would adjust your stock position as the delta changes. And remember, you originally collected \$3.50 per share premium when you sold the call.)*
 
 ---
-
-# DNP on Blockchain
-**DNP - Delta Neutral Portfolio**: A smart contract-based hedge fund that dynamically rebalances positions to maintain delta neutrality.
-
-
