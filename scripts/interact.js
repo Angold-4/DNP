@@ -27,9 +27,9 @@ async function main() {
     const aggregator = MockV3Aggregator.attach(aggregatorAddress);
 
     // Initial Testing
-    // Example Interaction: Deposit 5 ETH.
-    console.log("Depositing 5 ETH into the portfolio...");
-    const depositTx = await portfolio.deposit({ value: ethers.parseEther("5") });
+    // Example Interaction: Deposit 2.5 ETH.
+    console.log("Depositing 2.5 ETH into the portfolio...");
+    const depositTx = await portfolio.deposit({ value: ethers.parseEther("2.5") });
     await depositTx.wait();
     console.log("Deposit complete.");
 
@@ -39,7 +39,7 @@ async function main() {
 
     // Open a short option position.
     console.log("Opening a short option position...");
-    const optionCount = 10;
+    const optionCount = 5; // 5 ETH
     const optionStrike = 2000 * 1e8; // strike price (using 8 decimals)
     const openOptionTx = await portfolio.openShortOption(optionCount, optionStrike);
     await openOptionTx.wait();
@@ -120,7 +120,7 @@ async function simulatePriceFluctuation(portfolio, aggregator, optionStrike) {
 	} catch (err) {
 	    console.error("Error in price simulation and update:", err);
 	}
-    }, 10000); // 10000 ms = 10 seconds
+    }, 5000); // 5000 ms = 5 seconds
 }
 
 main().catch((error) => {

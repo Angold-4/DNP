@@ -1,5 +1,6 @@
 # Delta Neutral Portfolio
-**DNP - Delta Neutral Portfolio**: A smart contract-based hedge fund that dynamically rebalances positions to maintain delta neutrality.
+
+This repository demonstrates a straightforward **delta neutral portfolio** on Ethereum, the project deploys a smart contract on a Hardhat in-memory network (`npx hardhat node`) that automatically rebalances ETH positions to maintain a delta-neutral state for a short option position.
 
 ## Quick Start
 
@@ -18,6 +19,102 @@ npx hardhat node
 ```shell
 ./simulate.sh
 ```
+
+## Overview
+The implementation features three key ideas:
+
+1. **Off-Chain Delta Computation**  
+   To save on gas costs and reduce on-chain complexity, the option delta is calculated off-chain using the Black–Scholes model. The JavaScript statistical library [JStat](https://github.com/jstat/jstat) is used in `src/deltaCalculator.js` to compute the delta for a European call option.
+
+2. **Smart Contract Rebalancing**
+   The smart contract ([`DeltaNeutralPortfolio.sol`](https://github.com/Angold-4/DNP/blob/main/contracts/DeltaNeutralPortfolio.sol)) maintains:
+   - **Underlying Position:** The amount of ETH held.
+   - **Option Position:** The number of shorted options with a defined strike price.
+   - **Computed Option Delta:** Updated on-chain by an off-chain service.
+   
+   Based on the computed net delta, the contract automatically triggers buy/sell trades:
+   - **Net Delta > 0:** Excess long exposure leads to selling ETH.
+   - **Net Delta < 0:** Excess short exposure leads to buying ETH.
+
+3. **Real-World Simulation**
+   A simulation script mimics live market conditions by updating the ETH price every 10 seconds. For each price change:
+   - The off-chain system calculates the current option delta.
+   - The contract's `updateOptionDelta()` and `rebalance()` methods are called to adjust the portfolio.
+   
+   This dynamic rebalancing demonstrates how small fluctuations in ETH price can be mitigated to maintain a delta-neutral position.
+
+## Demo
+Here are the parameters of our on-chain option:
+```javascript
+const optionCount = 5;
+const optionStrike = 2000 * 1e8; // Strike price (8 decimals)
+const r = 0.01;                  // Risk-free rate (1%)
+const sigma = 0.5;               // Volatility (50%)
+const T = 30 / 365;              // Time to expiration: 30 days
+```
+
+![demo](demo.gif)
+
+### Explanation of a Simulation Output
+
+```
+Depositing 2.5 ETH into the portfolio...
+Deposit complete.
+Current underlying position (ETH): 2.5
+Opening a short option position...
+Short option position opened.
+Initial net delta (1e18 fixed point): 2500000000000000000
+```
+### Example 1: ETH Price Increase (2000 to 2025 USD)
+
+```
+--- Price Update Triggered ---
+New simulated ETH price (8 decimals): 202500000000
+Price updated in aggregator.
+Computed off-chain option delta (call): 0.5651611759884737
+Option delta in 1e18 fixed point: 565161175988473700
+
+--- RebalanceTrade Event (Live) ---
+Action (buy/sell): buy
+Trade Amount: 0.3258058799423685 ETH
+Net Delta: -0.3258058799423685
+Current Option Delta: 0.5651611759884737
+Underlying Position: 2.8258058799423685 ETH
+-------------------------------------
+```
+
+- **Scenario:**  
+  When ETH’s price increases to 2025 USD, the option delta rises. The computed delta for our short option is now larger, causing our overall net delta to become negative.
+
+- **Action:**  
+  **Buy ETH.**  
+  - **Why?** A negative net delta indicates that our portfolio is too short relative to the option’s delta. By buying ETH, we increase our underlying position to counteract the increased option delta.
+
+### Example 2: ETH Price Decrease (2025 to 1922 USD)
+```
+--- Price Update Triggered ---
+New simulated ETH price (8 decimals): 192200000000
+Price updated in aggregator.
+Computed off-chain option delta (call): 0.4206969963533221
+Option delta in 1e18 fixed point: 420696996353322100
+
+--- RebalanceTrade Event (Live) ---
+Action (buy/sell): sell
+Trade Amount: 0.722320898175758 ETH
+Net Delta: 0.722320898175758
+Current Option Delta: 0.4206969963533221
+Underlying Position: 2.1034849817666105 ETH
+-------------------------------------
+```
+- **Scenario:**  
+  When ETH's price falls to 1922 USD, the option delta decreases. The computed delta for our short option is now lower, making the overall net delta positive.
+
+- **Action:**  
+  **Sell ETH.**  
+  - **Why?** A positive net delta indicates that we are too long on the underlying asset relative to the option’s lower delta. By selling ETH, we reduce our underlying position to match the lower option delta.
+
+These examples demonstrate that our implementation correctly monitors changes in the option delta and executes rebalancing trades (buy/sell) to ensure the overall portfolio remains delta neutral. This dynamic adjustment is crucial to protect the portfolio’s net income from the impact of small underlying price movements.
+
 
 ## Delta: A Measure of Price Sensitivity
 **Delta** is a measure of how much the price of a derivative (like an option) changes when the price of the underlying asset (like a stock) changes.
