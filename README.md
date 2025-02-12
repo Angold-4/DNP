@@ -2,51 +2,53 @@
 **DNP - Delta Neutral Portfolio**: A smart contract-based hedge fund that dynamically rebalances positions to maintain delta neutrality.
 
 ## Quick Start
-```js
-npm install --save-dev hardhat
-npx hardhat init
-npx hardhat compile
-npx hardhat test
+
+### Install Dependencies
+```shell
+npm install --save-dev hardhat jstat
+```
+
+### Bring Up Local Hardhat Test Network
+(On a new Terminal)
+```shell
+npx hardhat node
+```
+
+### Run Simulation
+```shell
+./simulate.sh
 ```
 
 ## Delta: A Measure of Price Sensitivity
-Delta is a measure of how much the price of a derivative (like an option) changes when the price of the underlying asset (like a stock) changes.  
-The delta of an option (for a call, between 0 and 1) tells you approximately how much the option’s price will change for a \$1 change in the underlying asset’s price.
-
-For example, a delta of 0.4 means that for every \$1 increase in ETH, the call’s value increases by about \$0.40. (Since you sold the call, you have a negative delta exposure of –0.4.)
-
-The delta is calculated using a pricing model to compute both the option's price (premium) and its sensitivities (the "Greeks").
-
-### Example
-If you have an option with a delta of 0.5, then for every \$1 increase in the price of the underlying asset, the option's price is expected to increase by about \$0.5.
-
+**Delta** is a measure of how much the price of a derivative (like an option) changes when the price of the underlying asset (like a stock) changes.
+* The delta of an option (for a call, between 0 and 1) tells you approximately how much the option’s price will change for a \$1 change in the underlying asset's price.
+* For example, a delta of 0.4 means that for every \$1 increase in ETH, the call's value increases by about \$0.40. (Since you sold the call, you have a negative delta exposure of –0.4.)
+* The delta is calculated using a pricing model to compute both the option's price (premium) and its sensitivities (the "Greeks").
 
 ## Delta Neutral: Balancing Out Risk
 Delta neutral means the overall portfolio delta is zero, so the gains and losses from price movements of the underlying asset cancel each other out.
 
-### Example
-If you sell 1 at-the-money call that has a delta of +0.5 (0.50), you might buy 0.5 units of the underlying to hedge.  
-This way, if the underlying goes up a little, the call you sold loses (because calls gain value when price goes up),  
+If you sell 1 at-the-money call that has a delta of +0.5 (0.50), you might buy 0.5 units of the underlying to hedge.
+This way, if the underlying goes up a little, the call you sold loses (because calls gain value when price goes up).
 but the underlying you hold gains—and ideally, these small movements offset each other.
 
 ### Example On Blockchain
-Suppose you hold a call option on ETH that has a delta of 0.5. This means the option's price will move about half as much as ETH's price.  
-To achieve a delta neutral position, you could short (sell) a certain amount of ETH such that the loss from the short position offsets the gain from the call option when ETH's price moves.  
-If you do this correctly, small moves in ETH's price won't change the overall value of your combined positions.
+Suppose you hold a call option on ETH that has a delta of 0.5. This means the option's price will move about half as much as ETH's price.
+To achieve a delta neutral position, you could short (sell) a certain amount of ETH such that the loss from the short position offsets the gain from the call option when ETH's price moves.
+If you do this correctly, **small moves in ETH's price won't change the overall value of your combined positions**.
 
 ## Rebalancing
-The delta of options isn't static; it changes as the price of the underlying asset changes. This is why traders often need to rebalance their portfolio to maintain delta neutrality.  
+The delta of options isn't static; it changes as the price of the underlying asset changes. This is why traders often need to rebalance their portfolio to maintain delta neutrality.
 In blockchain environments, rebalancing can be complex and may involve transaction costs, so automated systems are often used to manage this.
 
 ## Make Money?
 Even though the portfolio is hedged against small directional moves, the idea isn't to "do nothing" but rather to profit from factors other than simple price movement, such as:
 
-### Option Premium
-Option Premium is the price the buyer pays (and the seller receives) for the right/option on an underlying asset.  
+### 1. Option Premium
+**Option Premium** is the price the buyer pays (and the seller receives) for the right/option on an underlying asset.  
 Because short options can gain or lose value if the underlying moves significantly, traders will hedge their position in the underlying (for instance, by buying or selling shares of the underlying stock or by using other options/futures).
 
-#### What is an Option
-An option is a financial contract that gives the holder (the buyer of the option) the right (but not the obligation) to buy or sell an underlying asset (such as a stock or an index) at a specified price (called the strike price) on or before a certain date (the expiration date).
+> An option is a financial contract that gives the holder (the buyer of the option) the right (but not the obligation) to buy or sell an underlying asset (such as a stock or an index) at a specified price (called the strike price) on or before a certain date (the expiration date).
 
 There are two basic types of options:
 1. **Call Option:** Gives the buyer the right (but not the obligation) to buy the underlying asset at a set strike price by (or on) the expiration.  
@@ -111,5 +113,3 @@ Now suppose the stock falls from \$100 to \$99.
    - Total loss: -\$0.02 per share
 
 *(Note: The exact numbers depend on how the option's delta changes and how quickly you rebalance. In a dynamic delta–hedging strategy, you would adjust your stock position as the delta changes. And remember, you originally collected \$3.50 per share premium when you sold the call.)*
-
----

@@ -6,4 +6,9 @@ module.exports = {
     mocha: {
 	reporter: "spec",
     },
+    networks: {
+	hardhat: {
+	    loggingEnabled: true, // Disable JSON-RPC logging
+	},
+    },
 };
